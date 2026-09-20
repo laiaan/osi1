@@ -22,7 +22,7 @@
         }
         .terminal {
             width: 100%;
-            max-width: 500px;
+            max-width: 550px;
             border: 1px solid #333;
             background-color: #111;
             padding: 25px;
@@ -88,6 +88,11 @@
             font-size: 0.85rem;
             display: none;
         }
+        .success {
+            color: #6bff6b;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
         .cursor {
             display: inline-block;
             width: 8px;
@@ -107,10 +112,55 @@
             padding: 10px 15px;
             background-color: #161616;
             border: 1px solid #444;
+            display: block;
+            width: 100%;
+            color: #fff;
+            cursor: pointer;
         }
         .door-btn:hover {
             background-color: #222;
             border-color: #777;
+        }
+        /* Graella per al Nivell 3 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        @media(min-width: 450px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        .word-tile {
+            background-color: #161616;
+            border: 1px solid #444;
+            color: #ccc;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+        .word-tile:hover {
+            background-color: #222;
+            border-color: #666;
+        }
+        .word-tile.selected {
+            background-color: #333;
+            border-color: #aaa;
+            color: #fff;
+            font-weight: bold;
+        }
+        .found-group {
+            background-color: #112211;
+            border: 1px solid #285528;
+            color: #88ff88;
+            padding: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
         }
     </style>
 </head>
@@ -168,16 +218,36 @@
                     Quin és el valor de ◆ + ▲?
                 </div>
                 <div class="input-group">
-                    <label for="level2-input">INTRO DUEix EL VALOR NUMÈRIC:</label>
+                    <label for="level2-input">INTRODUEIX EL VALOR NUMÈRIC:</label>
                     <input type="text" id="level2-input" placeholder="?">
                     <button id="level2-btn">COMPROVAR</button>
                     <div id="level2-msg" class="error">VALOR INCORRECTE. Torna a calcular.</div>
                 </div>
             </div>
 
-            <!-- CONTENIDOR PER ALS SEÜENTS NIVELLS (MÉS ENDAVANT) -->
-            <div id="next-levels-container" style="display: none;">
-                <div class="output" id="next-level-output"></div>
+            <!-- NIVELL 3: CLASSIFICACIÓ DE 12 PARAULES -->
+            <div id="level-3-container" style="display: none;">
+                <div class="output" style="margin-bottom: 10px;">
+                    NIVELL 3: CLASSIFICACIÓ DE NODES DE DADES<br><br>
+                    Selecciona exactament 4 paraules que comparteixin una categoria comuna i clica "Comprovar grup". Has de trobar els 3 grups amagats.
+                </div>
+                <div id="found-groups-list"></div>
+                <div class="grid-container" id="word-grid"></div>
+                <button id="level3-btn">COMPROVAR GRUP (0/4)</button>
+                <div id="level3-msg" class="error" style="margin-top: 10px;"></div>
+            </div>
+
+            <!-- PANTALLA FINAL / VICTÒRIA -->
+            <div id="win-container" style="display: none;">
+                <div class="output" id="win-output">
+                    ALL SYSTEMS CLEAR<br>
+                    3/3 CHALLENGES COMPLETED<br>
+                    ACCESS TO REWARD: GRANTED<br><br>
+                    ----------------------------------------<br>
+                    LA RECOMPENSA NO ÉS AQUÍ.<br>
+                    ----------------------------------------<br><br>
+                    [ Properament: Pista física personalitzada per trobar on està amagat el regal... ]
+                </div>
             </div>
         </div>
     </div>
@@ -188,8 +258,8 @@
         const loginScreen = document.getElementById("login-screen");
         const level1Container = document.getElementById("level-1-container");
         const level2Container = document.getElementById("level-2-container");
-        const nextLevelsContainer = document.getElementById("next-levels-container");
-        const nextLevelOutput = document.getElementById("next-level-output");
+        const level3Container = document.getElementById("level-3-container");
+        const winContainer = document.getElementById("win-container");
 
         const codeInput = document.getElementById("access-code");
         const loginBtn = document.getElementById("login-btn");
@@ -201,9 +271,28 @@
         const level2Btn = document.getElementById("level2-btn");
         const level2Msg = document.getElementById("level2-msg");
 
+        // Dades del Nivell 3
+        const groups = [
+            { name: "TIPUS DE CAFÈ", words: ["ESPRESSO", "CÒRTADO", "CAPPUCCINO", "AMERICÀ"] },
+            { name: "TIPUS DE NÚVOLS", words: ["CÚMUL", "ESTRAT", "CIRRUS", "NIMBUS"] },
+            { name: "CONSTEL·LACIONS", words: ["ORION", "LIRA", "CISNE", "DRAC"] }
+        ];
+
+        let allWords = [];
+        groups.forEach(g => allWords.push(...g.words));
+        // Barrejar paraules aleatòriament
+        allWords.sort(() => Math.random() - 0.5);
+
+        let selectedWords = [];
+        let foundGroupsCount = 0;
+
+        const wordGrid = document.getElementById("word-grid");
+        const level3Btn = document.getElementById("level3-btn");
+        const level3Msg = document.getElementById("level3-msg");
+        const foundGroupsList = document.getElementById("found-groups-list");
+
         function handleLogin() {
             const enteredCode = codeInput.value.trim();
-            
             if (enteredCode === correctCode) {
                 errorMsg.style.display = "none";
                 loginScreen.style.display = "none";
@@ -232,12 +321,79 @@
             if (ans === "11") {
                 level2Msg.style.display = "none";
                 level2Container.style.display = "none";
-                nextLevelsContainer.style.display = "block";
-                nextLevelOutput.innerHTML = "VALOR CORRECTE.<br>NIVELL 2 SUPERAT.<br><br>[ Carregant el Nivell 3 - Classificació... (Properament) ]";
+                level3Container.style.display = "block";
+                renderGrid();
             } else {
                 level2Msg.style.display = "block";
                 level2Input.value = "";
                 level2Input.focus();
+            }
+        }
+
+        function renderGrid() {
+            wordGrid.innerHTML = "";
+            allWords.forEach(word => {
+                const tile = document.createElement("div");
+                tile.className = "word-tile";
+                if (selectedWords.includes(word)) tile.classList.add("selected");
+                tile.innerText = word;
+                tile.onclick = () => toggleWord(word, tile);
+                wordGrid.appendChild(tile);
+            });
+            level3Btn.innerText = `COMPROVAR GRUP (${selectedWords.length}/4)`;
+        }
+
+        function toggleWord(word, tile) {
+            const index = selectedWords.indexOf(word);
+            if (index > -1) {
+                selectedWords.splice(index, 1);
+                tile.classList.remove("selected");
+            } else {
+                if (selectedWords.length < 4) {
+                    selectedWords.push(word);
+                    tile.classList.add("selected");
+                }
+            }
+            level3Btn.innerText = `COMPROVAR GRUP (${selectedWords.length}/4)`;
+        }
+
+        function checkLevel3Group() {
+            if (selectedWords.length !== 4) {
+                level3Msg.style.display = "block";
+                level3Msg.innerText = "ERROR: Has de seleccionar exactament 4 paraules.";
+                return;
+            }
+
+            let matchedGroup = null;
+            groups.forEach(g => {
+                const matches = selectedWords.every(w => g.words.includes(w)) && g.words.every(w => selectedWords.includes(w));
+                if (matches) matchedGroup = g;
+            });
+
+            if (matchedGroup) {
+                level3Msg.style.display = "none";
+                // Eliminar paraules encertades de allWords
+                allWords = allWords.filter(w => !matchedGroup.words.includes(w));
+                
+                // Mostrar grup trobat
+                const groupDiv = document.createElement("div");
+                groupDiv.className = "found-group";
+                groupDiv.innerHTML = `<strong>${matchedGroup.name}:</strong> ${matchedGroup.words.join(", ")}`;
+                foundGroupsList.appendChild(groupDiv);
+
+                selectedWords = [];
+                foundGroupsCount++;
+
+                if (foundGroupsCount === 3) {
+                    // Nivell 3 completat! Passem a la pantalla de victòria
+                    level3Container.style.display = "none";
+                    winContainer.style.display = "block";
+                } else {
+                    renderGrid();
+                }
+            } else {
+                level3Msg.style.display = "block";
+                level3Msg.innerText = "ERROR: Aquestes 4 paraules no formen un grup vàlid.";
             }
         }
 
@@ -246,6 +402,8 @@
 
         level2Btn.addEventListener("click", handleLevel2);
         level2Input.addEventListener("keypress", function(e) { if (e.key === "Enter") handleLevel2(); });
+
+        level3Btn.addEventListener("click", checkLevel3Group);
 
         window.onload = function() {
             codeInput.focus();
