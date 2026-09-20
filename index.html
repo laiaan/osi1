@@ -17,13 +17,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
             padding: 20px;
         }
         .terminal {
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
             border: 1px solid #333;
             background-color: #111;
             padding: 25px;
@@ -89,6 +88,12 @@
             font-size: 0.85rem;
             display: none;
         }
+        .success {
+            color: #6bff6b;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            display: none;
+        }
         .cursor {
             display: inline-block;
             width: 8px;
@@ -101,6 +106,17 @@
         @keyframes blink {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
+        }
+        .door-btn {
+            margin-top: 10px;
+            text-align: left;
+            padding: 10px 15px;
+            background-color: #161616;
+            border: 1px solid #444;
+        }
+        .door-btn:hover {
+            background-color: #222;
+            border-color: #777;
         }
     </style>
 </head>
@@ -119,14 +135,40 @@
                 <div class="input-group">
                     <label for="access-code">ENTER ACCESS CODE:</label>
                     <input type="password" id="access-code" maxlength="4" placeholder="_ _ _ _">
-                    <button id="login-btn">ACCedir</button>
+                    <button id="login-btn">ACCEDIR</button>
                     <div id="error-msg" class="error">ACCÉS DENEGAT. Codi invàlid.</div>
                 </div>
             </div>
 
-            <!-- CONTENIDOR PER ALS NIVELLS (S'ACTIVARÀ MÉS ENDAVANT) -->
+            <!-- CONTENIDOR PER ALS NIVELLS -->
             <div id="level-screen" style="display: none;">
                 <div class="output" id="level-output"></div>
+                
+                <!-- NIVELL 1: LES TRES PORTES -->
+                <div id="level-1-container" style="display: none;">
+                    <div class="output" style="margin-bottom: 10px;">
+                        NIVELL 1: PROTOCOL DE SEGURETAT DE LES PORTES<br><br>
+                        Tres portes bloquegen el teu camí. Només una és segura.<br>
+                        S'ha interceptat el registre de les afirmacions de cada porta:
+                        <br><br>
+                        [Porta A]: "La sortida és darrere de la porta B."<br>
+                        [Porta B]: "La sortida no és darrere d'aquesta porta."<br>
+                        [Porta C]: "La sortida no és darrere de la porta A."<br>
+                        <br>
+                        AVÍS DEL SISTEMA: Només UNA de les tres afirmacions és certa.
+                        <br><br>
+                        Selecciona quina porta vols triar:
+                    </div>
+                    <button class="door-btn" onclick="checkDoor('A')">>> TRIAR PORTA A</button>
+                    <button class="door-btn" onclick="checkDoor('B')">>> TRIAR PORTA B</button>
+                    <button class="door-btn" onclick="checkDoor('C')">>> TRIAR PORTA C</button>
+                    <div id="level1-msg" class="error" style="margin-top: 15px;"></div>
+                </div>
+
+                <!-- CONTENIDOR PER ALS SEÜENTS NIVELLS (MÉS ENDAVANT) -->
+                <div id="next-levels-container" style="display: none;">
+                    <div class="output" id="next-level-output"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -140,6 +182,10 @@
         const codeInput = document.getElementById("access-code");
         const loginBtn = document.getElementById("login-btn");
         const errorMsg = document.getElementById("error-msg");
+        const level1Container = document.getElementById("level-1-container");
+        const level1Msg = document.getElementById("level1-msg");
+        const nextLevelsContainer = document.getElementById("next-levels-container");
+        const nextLevelOutput = document.getElementById("next-level-output");
 
         function handleLogin() {
             const enteredCode = codeInput.value.trim();
@@ -149,17 +195,30 @@
                 loginScreen.style.display = "none";
                 levelScreen.style.display = "block";
                 
-                // Animació d'entrada i missatge de benvinguda temporal
                 levelOutput.innerHTML = "VERIFYING...<br>ACCESS GRANTED<br><br>WELCOME, OSI.";
                 
                 setTimeout(() => {
-                    levelOutput.innerHTML += "<br><br>[ Carregant el Nivell 1... (Properament) ]";
+                    levelOutput.innerHTML = "";
+                    level1Container.style.display = "block";
                 }, 2000);
 
             } else {
                 errorMsg.style.display = "block";
                 codeInput.value = "";
                 codeInput.focus();
+            }
+        }
+
+        function checkDoor(door) {
+            if (door === 'A') {
+                level1Msg.style.display = "none";
+                level1Container.style.display = "none";
+                nextLevelsContainer.style.display = "block";
+                
+                nextLevelOutput.innerHTML = "ACCÉS CORRECTE.<br>PORTA A DESBLOQUEJADA.<br><br>[ Carregant el Nivell 2... (Properament) ]";
+            } else {
+                level1Msg.style.display = "block";
+                level1Msg.innerHTML = "ERROR: Porta incorrecta. El sistema no respon. Torna-ho a provar.";
             }
         }
 
@@ -171,7 +230,6 @@
             }
         });
 
-        // Posar el focus automàticament al camp quan s'obre la web
         window.onload = function() {
             codeInput.focus();
         };
