@@ -88,11 +88,6 @@
             font-size: 0.85rem;
             display: none;
         }
-        .success {
-            color: #6bff6b;
-            margin-top: 10px;
-            font-size: 0.85rem;
-        }
         .cursor {
             display: inline-block;
             width: 8px;
@@ -121,7 +116,6 @@
             background-color: #222;
             border-color: #777;
         }
-        /* Graella per al Nivell 3 */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -177,17 +171,29 @@
                     AUTHENTICATION REQUIRED<span class="cursor"></span>
                 </div>
                 <div class="input-group">
-                    <label for="access-code">ENTER ACCESS CODE:</label>
+                    <label for="access-code">INTRODUEIX EL CODI D'ACCÉS:</label>
                     <input type="password" id="access-code" maxlength="4" placeholder="_ _ _ _">
                     <button id="login-btn">ACCEDIR</button>
                     <div id="error-msg" class="error">ACCÉS DENEGAT. Codi invàlid.</div>
                 </div>
             </div>
 
-            <!-- NIVELL 1: LES TRES PORTES -->
+            <!-- NIVELL 1: CLASSIFICACIÓ DE 12 PARAULES -->
             <div id="level-1-container" style="display: none;">
                 <div class="output" style="margin-bottom: 10px;">
-                    NIVELL 1: PROTOCOL DE SEGURETAT DE LES PORTES<br><br>
+                    NIVELL 1: CLASSIFICACIÓ DE NODES DE DADES<br><br>
+                    Selecciona exactament 4 paraules que comparteixin una categoria comuna i clica "Comprovar grup". Has de trobar els 3 grups amagats.
+                </div>
+                <div id="found-groups-list"></div>
+                <div class="grid-container" id="word-grid"></div>
+                <button id="level1-btn">COMPROVAR GRUP (0/4)</button>
+                <div id="level1-msg" class="error" style="margin-top: 10px;"></div>
+            </div>
+
+            <!-- NIVELL 2: LES TRES PORTES -->
+            <div id="level-2-container" style="display: none;">
+                <div class="output" style="margin-bottom: 10px;">
+                    NIVELL 2: PROTOCOL DE SEGURETAT DE LES PORTES<br><br>
                     Tres portes bloquegen el teu camí. Només una és segura.<br>
                     S'ha interceptat el registre de les afirmacions de cada porta:
                     <br><br>
@@ -202,39 +208,23 @@
                 <button class="door-btn" onclick="checkDoor('A')">>> TRIAR PORTA A</button>
                 <button class="door-btn" onclick="checkDoor('B')">>> TRIAR PORTA B</button>
                 <button class="door-btn" onclick="checkDoor('C')">>> TRIAR PORTA C</button>
-                <div id="level1-msg" class="error" style="margin-top: 15px;"></div>
+                <div id="level2-msg" class="error" style="margin-top: 15px;"></div>
             </div>
 
-            <!-- NIVELL 2: EQUACIONS AMB SÍMBOLS -->
-            <div id="level-2-container" style="display: none;">
-                <div class="output" style="margin-bottom: 10px;">
-                    NIVELL 2: ANÀLISI DE PATRONS MATEMÀTICS<br><br>
-                    S'han interceptat fitxers xifrats amb valors desconeguts:<br><br>
-                    ▲ + ● + ■ = 18<br>
-                    ● + ■ + ◆ = 15<br>
-                    ▲ + ■ + ◆ = 17<br>
-                    ▲ + ● + ◆ = 16<br><br>
-                    Calcula els valors de cada símbol per desxifrar el codi final.<br>
-                    Quin és el valor de ◆ + ▲?
-                </div>
-                <div class="input-group">
-                    <label for="level2-input">INTRODUEIX EL VALOR NUMÈRIC:</label>
-                    <input type="text" id="level2-input" placeholder="?">
-                    <button id="level2-btn">COMPROVAR</button>
-                    <div id="level2-msg" class="error">VALOR INCORRECTE. Torna a calcular.</div>
-                </div>
-            </div>
-
-            <!-- NIVELL 3: CLASSIFICACIÓ DE 12 PARAULES -->
+            <!-- NIVELL 3: ANAGRAMA -->
             <div id="level-3-container" style="display: none;">
                 <div class="output" style="margin-bottom: 10px;">
-                    NIVELL 3: CLASSIFICACIÓ DE NODES DE DADES<br><br>
-                    Selecciona exactament 4 paraules que comparteixin una categoria comuna i clica "Comprovar grup". Has de trobar els 3 grups amagats.
+                    NIVELL 3: DESXIFRAT DE CLAU FINAL<br><br>
+                    El sistema mostra un fitxer corrupte amb lletres barrejades. Ordena-les per trobar la paraula clau:<br><br>
+                    Lletres: **G - M - A - I - N - E**<br>
+                    Pista: Cosa o assumpte obscur o difícil de comprendre.
                 </div>
-                <div id="found-groups-list"></div>
-                <div class="grid-container" id="word-grid"></div>
-                <button id="level3-btn">COMPROVAR GRUP (0/4)</button>
-                <div id="level3-msg" class="error" style="margin-top: 10px;"></div>
+                <div class="input-group">
+                    <label for="level3-input">INTRODUEIX LA PARAULA CLAU:</label>
+                    <input type="text" id="level3-input" placeholder="RESPOSTA">
+                    <button id="level3-btn">DESXIFRAR</button>
+                    <div id="level3-error" class="error">CLAU INCORRECTA. Torna a provar.</div>
+                </div>
             </div>
 
             <!-- PANTALLA FINAL / VICTÒRIA -->
@@ -264,14 +254,8 @@
         const codeInput = document.getElementById("access-code");
         const loginBtn = document.getElementById("login-btn");
         const errorMsg = document.getElementById("error-msg");
-        
-        const level1Msg = document.getElementById("level1-msg");
-        
-        const level2Input = document.getElementById("level2-input");
-        const level2Btn = document.getElementById("level2-btn");
-        const level2Msg = document.getElementById("level2-msg");
 
-        // Dades del Nivell 3
+        // Dades del Nivell 1 (Classificació)
         const groups = [
             { name: "TIPUS DE CAFÈ", words: ["ESPRESSO", "CÒRTADO", "CAPPUCCINO", "AMERICÀ"] },
             { name: "TIPUS DE NÚVOLS", words: ["CÚMUL", "ESTRAT", "CIRRUS", "NIMBUS"] },
@@ -280,16 +264,23 @@
 
         let allWords = [];
         groups.forEach(g => allWords.push(...g.words));
-        // Barrejar paraules aleatòriament
         allWords.sort(() => Math.random() - 0.5);
 
         let selectedWords = [];
         let foundGroupsCount = 0;
 
         const wordGrid = document.getElementById("word-grid");
-        const level3Btn = document.getElementById("level3-btn");
-        const level3Msg = document.getElementById("level3-msg");
+        const level1Btn = document.getElementById("level1-btn");
+        const level1Msg = document.getElementById("level1-msg");
         const foundGroupsList = document.getElementById("found-groups-list");
+
+        // Nivell 2
+        const level2Msg = document.getElementById("level2-msg");
+
+        // Nivell 3
+        const level3Input = document.getElementById("level3-input");
+        const level3Btn = document.getElementById("level3-btn");
+        const level3Error = document.getElementById("level3-error");
 
         function handleLogin() {
             const enteredCode = codeInput.value.trim();
@@ -297,36 +288,11 @@
                 errorMsg.style.display = "none";
                 loginScreen.style.display = "none";
                 level1Container.style.display = "block";
+                renderGrid();
             } else {
                 errorMsg.style.display = "block";
                 codeInput.value = "";
                 codeInput.focus();
-            }
-        }
-
-        function checkDoor(door) {
-            if (door === 'A') {
-                level1Msg.style.display = "none";
-                level1Container.style.display = "none";
-                level2Container.style.display = "block";
-                level2Input.focus();
-            } else {
-                level1Msg.style.display = "block";
-                level1Msg.innerHTML = "ERROR: Porta incorrecta. El sistema no respon. Torna-ho a provar.";
-            }
-        }
-
-        function handleLevel2() {
-            const ans = level2Input.value.trim();
-            if (ans === "11") {
-                level2Msg.style.display = "none";
-                level2Container.style.display = "none";
-                level3Container.style.display = "block";
-                renderGrid();
-            } else {
-                level2Msg.style.display = "block";
-                level2Input.value = "";
-                level2Input.focus();
             }
         }
 
@@ -340,7 +306,7 @@
                 tile.onclick = () => toggleWord(word, tile);
                 wordGrid.appendChild(tile);
             });
-            level3Btn.innerText = `COMPROVAR GRUP (${selectedWords.length}/4)`;
+            level1Btn.innerText = `COMPROVAR GRUP (${selectedWords.length}/4)`;
         }
 
         function toggleWord(word, tile) {
@@ -354,13 +320,13 @@
                     tile.classList.add("selected");
                 }
             }
-            level3Btn.innerText = `COMPROVAR GRUP (${selectedWords.length}/4)`;
+            level1Btn.innerText = `COMPROVAR GRUP (${selectedWords.length}/4)`;
         }
 
-        function checkLevel3Group() {
+        function checkLevel1Group() {
             if (selectedWords.length !== 4) {
-                level3Msg.style.display = "block";
-                level3Msg.innerText = "ERROR: Has de seleccionar exactament 4 paraules.";
+                level1Msg.style.display = "block";
+                level1Msg.innerText = "ERROR: Has de seleccionar exactament 4 paraules.";
                 return;
             }
 
@@ -371,11 +337,9 @@
             });
 
             if (matchedGroup) {
-                level3Msg.style.display = "none";
-                // Eliminar paraules encertades de allWords
+                level1Msg.style.display = "none";
                 allWords = allWords.filter(w => !matchedGroup.words.includes(w));
                 
-                // Mostrar grup trobat
                 const groupDiv = document.createElement("div");
                 groupDiv.className = "found-group";
                 groupDiv.innerHTML = `<strong>${matchedGroup.name}:</strong> ${matchedGroup.words.join(", ")}`;
@@ -385,25 +349,49 @@
                 foundGroupsCount++;
 
                 if (foundGroupsCount === 3) {
-                    // Nivell 3 completat! Passem a la pantalla de victòria
-                    level3Container.style.display = "none";
-                    winContainer.style.display = "block";
+                    level1Container.style.display = "none";
+                    level2Container.style.display = "block";
                 } else {
                     renderGrid();
                 }
             } else {
-                level3Msg.style.display = "block";
-                level3Msg.innerText = "ERROR: Aquestes 4 paraules no formen un grup vàlid.";
+                level1Msg.style.display = "block";
+                level1Msg.innerText = "ERROR: Aquestes 4 paraules no formen un grup vàlid.";
+            }
+        }
+
+        function checkDoor(door) {
+            if (door === 'A') {
+                level2Msg.style.display = "none";
+                level2Container.style.display = "none";
+                level3Container.style.display = "block";
+                level3Input.focus();
+            } else {
+                level2Msg.style.display = "block";
+                level2Msg.innerHTML = "ERROR: Porta incorrecta. El sistema no respon. Torna-ho a provar.";
+            }
+        }
+
+        function handleLevel3() {
+            const ans = level3Input.value.trim().toUpperCase();
+            if (ans === "ENIGMA") {
+                level3Error.style.display = "none";
+                level3Container.style.display = "none";
+                winContainer.style.display = "block";
+            } else {
+                level3Error.style.display = "block";
+                level3Input.value = "";
+                level3Input.focus();
             }
         }
 
         loginBtn.addEventListener("click", handleLogin);
         codeInput.addEventListener("keypress", function(e) { if (e.key === "Enter") handleLogin(); });
 
-        level2Btn.addEventListener("click", handleLevel2);
-        level2Input.addEventListener("keypress", function(e) { if (e.key === "Enter") handleLevel2(); });
+        level1Btn.addEventListener("click", checkLevel1Group);
 
-        level3Btn.addEventListener("click", checkLevel3Group);
+        level3Btn.addEventListener("click", handleLevel3);
+        level3Input.addEventListener("keypress", function(e) { if (e.key === "Enter") handleLevel3(); });
 
         window.onload = function() {
             codeInput.focus();
