@@ -152,13 +152,12 @@
             <div id="level-2-container" style="display: none;">
                 <div class="output" style="margin-bottom: 10px;">
                     NIVELL 2: PROTOCOL DE SEGURETAT<br><br>
-                    Tres portes bloquegen el teu camí. Només una és segura.<br>
-                    S'han interceptat els registres lògics de cada porta:<br><br>
-                    [Porta A]: "La porta C és completament buida."<br>
-                    [Porta B]: "La sortida és exactament darrere d'aquesta porta (B)."<br>
-                    [Porta C]: "La porta B està mentint."<br><br>
-                    AVÍS DEL SISTEMA: Només UNA de les tres afirmacions és CERTA. Les altres dues són FALSES.<br><br>
-                    Introdueix quina porta vols travessar. Atenció: només tens 2 intents abans que el sistema de seguretat es reiniciï.
+                    Davant teu hi ha tres portes. Llegeixes el que hi ha escrit a cadascuna:<br><br>
+                    [Porta A]: "La sortida NO és aquí."<br>
+                    [Porta B]: "La instrucció de la Porta C és mentida."<br>
+                    [Porta C]: "La sortida és darrere de la Porta A."<br><br>
+                    AVÍS DEL SISTEMA: Només UNA d'aquestes afirmacions és certa. Les altres dues menteixen.<br><br>
+                    Introdueix quina porta amaga la sortida. Atenció: només tens 2 intents abans que el sistema es reiniciï.
                 </div>
                 <div class="input-group">
                     <label for="level2-input">ESCRIU LA TEVA ELECCIÓ (Ex: Porta X):</label>
@@ -168,13 +167,13 @@
                 </div>
             </div>
 
-            <!-- NIVELL 3: ENDEVINALLA DEL LLIBRE DE POESIA -->
+            <!-- NIVELL 3: ENDEVINALLA SUTIL DEL LLIBRE -->
             <div id="level-3-container" style="display: none;">
                 <div class="output" style="margin-bottom: 10px;">
-                    NIVELL 3: RECERCA EN EL MÓN FÍSIC<br><br>
-                    El sistema requereix un codi d'autenticació analògic. Abandona l'ordinador i troba un objecte a la teva habitació que respongui a això:<br><br>
-                    <i>"No tinc endolls ni pantalles, però guardo molta memòria. Les meves fulles no cauen a la tardor. No em va fer una màquina, sinó la mà d'aquell que et mira amb ulls d'avi. A l'interior hi bateguen rimes i versos dedicats a tu."</i><br><br>
-                    Troba'm, obre'm i busca l'única nota que amago al meu interior.
+                    NIVELL 3: RECERCA AL MÓN FÍSIC<br><br>
+                    L'autenticació final requereix una clau oculta al món real. Llegeix amb atenció:<br><br>
+                    <i>"Descanso en silenci al costat de molts altres com jo. No tinc pantalles ni bateries, però tinc fulles que mai cauen.<br><br>Mentre els meus veïns expliquen històries d'altres mons, jo guardo un llegat de veritat: lletres traçades a mà per algú de la teva sang que et mira amb un orgull immens."</i><br><br>
+                    Busca'm entre la multitud. Quan em trobis, obre'm i desxifra l'única nota que amago al meu interior.
                 </div>
                 <div class="input-group">
                     <label for="level3-input">INTRODUEIX LA PARAULA DE LA NOTA:</label>
@@ -282,7 +281,7 @@
             }
         }
 
-        // NIVELL 2 (LES PORTES)
+        // NIVELL 2 (LES TRES PORTES)
         const level2Input = document.getElementById("level2-input");
         const level2Btn = document.getElementById("level2-btn");
         const level2Error = document.getElementById("level2-error");
@@ -291,12 +290,11 @@
         level2Input.addEventListener("keypress", function(e) { if (e.key === "Enter") handleLevel2(); });
 
         function handleLevel2() {
-            // Netejar la resposta de l'usuari (treure espais i posar majúscules)
             const rawAns = level2Input.value.trim().toUpperCase();
-            const cleanAns = rawAns.replace(/\s+/g, ''); // Converteix "PORTA C" en "PORTAC"
+            const cleanAns = rawAns.replace(/\s+/g, ''); // Converteix "PORTA A" en "PORTAA"
 
-            // Respostes acceptades
-            if (cleanAns === "C" || cleanAns === "PORTAC") {
+            // La resposta correcta ara és la A
+            if (cleanAns === "A" || cleanAns === "PORTAA") {
                 level2Error.style.display = "none";
                 level2Container.style.display = "none";
                 level3Container.style.display = "block";
@@ -309,7 +307,7 @@
                     level2Input.value = "";
                     level2Input.focus();
                 } else {
-                    // Reinici del joc (però no del cronòmetre)
+                    // Reinici del joc al Nivell 1
                     level2Attempts = 0;
                     currentAnagramWord = "LABERINT";
                     anagramLettersElement.innerText = "T - R - N - I - L - B - A - E";
