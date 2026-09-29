@@ -27,6 +27,7 @@
             background-color: #111;
             padding: 25px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            position: relative;
         }
         .screen-header {
             color: #777;
@@ -35,6 +36,12 @@
             border-bottom: 1px solid #222;
             padding-bottom: 8px;
             letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .timer {
+            color: #ff4747;
+            font-weight: bold;
         }
         .output {
             margin-bottom: 20px;
@@ -101,67 +108,15 @@
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
         }
-        .door-btn {
-            margin-top: 10px;
-            text-align: left;
-            padding: 10px 15px;
-            background-color: #161616;
-            border: 1px solid #444;
-            display: block;
-            width: 100%;
-            color: #fff;
-            cursor: pointer;
-        }
-        .door-btn:hover {
-            background-color: #222;
-            border-color: #777;
-        }
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        @media(min-width: 450px) {
-            .grid-container {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        .word-tile {
-            background-color: #161616;
-            border: 1px solid #444;
-            color: #ccc;
-            padding: 12px 8px;
-            text-align: center;
-            font-size: 0.85rem;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.2s;
-        }
-        .word-tile:hover {
-            background-color: #222;
-            border-color: #666;
-        }
-        .word-tile.selected {
-            background-color: #333;
-            border-color: #aaa;
-            color: #fff;
-            font-weight: bold;
-        }
-        .found-group {
-            background-color: #112211;
-            border: 1px solid #285528;
-            color: #88ff88;
-            padding: 8px;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-        }
     </style>
 </head>
 <body>
 
     <div class="terminal">
-        <div class="screen-header">SYS_CORE // SECURE_GATEWAY_v2.2</div>
+        <div class="screen-header">
+            <span>SYS_CORE // V_2.2</span>
+            <span class="timer" id="timer-display">20:00</span>
+        </div>
         
         <div id="game-container">
             <!-- PANTALLA D'ACCÉS -->
@@ -178,51 +133,54 @@
                 </div>
             </div>
 
-            <!-- NIVELL 1: CLASSIFICACIÓ DE 12 PARAULES -->
+            <!-- NIVELL 1: ANAGRAMA -->
             <div id="level-1-container" style="display: none;">
                 <div class="output" style="margin-bottom: 10px;">
-                    NIVELL 1: CLASSIFICACIÓ DE NODES DE DADES<br><br>
-                    Selecciona exactament 4 paraules que comparteixin una categoria comuna i clica "Comprovar grup". Has de trobar els 3 grups amagats.
-                </div>
-                <div id="found-groups-list"></div>
-                <div class="grid-container" id="word-grid"></div>
-                <button id="level1-btn">COMPROVAR GRUP (0/4)</button>
-                <div id="level1-msg" class="error" style="margin-top: 10px;"></div>
-            </div>
-
-            <!-- NIVELL 2: LES TRES PORTES -->
-            <div id="level-2-container" style="display: none;">
-                <div class="output" style="margin-bottom: 10px;">
-                    NIVELL 2: PROTOCOL DE SEGURETAT DE LES PORTES<br><br>
-                    Tres portes bloquegen el teu camí. Només una és segura.<br>
-                    S'ha interceptat el registre de les afirmacions de cada porta:
-                    <br><br>
-                    [Porta A]: "La sortida és darrere de la porta B."<br>
-                    [Porta B]: "La sortida no és darrere d'aquesta porta."<br>
-                    [Porta C]: "La sortida no és darrere de la porta A."<br>
-                    <br>
-                    AVÍS DEL SISTEMA: Només UNA de les tres afirmacions és certa.
-                    <br><br>
-                    Selecciona quina porta vols triar:
-                </div>
-                <button class="door-btn" onclick="checkDoor('A')">>> TRIAR PORTA A</button>
-                <button class="door-btn" onclick="checkDoor('B')">>> TRIAR PORTA B</button>
-                <button class="door-btn" onclick="checkDoor('C')">>> TRIAR PORTA C</button>
-                <div id="level2-msg" class="error" style="margin-top: 15px;"></div>
-            </div>
-
-            <!-- NIVELL 3: ANAGRAMA -->
-            <div id="level-3-container" style="display: none;">
-                <div class="output" style="margin-bottom: 10px;">
-                    NIVELL 3: DESXIFRAT DE CLAU FINAL<br><br>
-                    El sistema mostra un fitxer corrupte amb lletres barrejades. Ordena-les per trobar la paraula clau:<br><br>
-                    Lletres: **G - M - A - I - N - E**
+                    NIVELL 1: DESXIFRAT DE CLAU<br><br>
+                    El sistema mostra un fitxer amb lletres barrejades. Ordena-les per trobar la paraula clau:<br><br>
+                    Lletres: <strong id="anagram-letters">G - M - A - I - N - E</strong>
                 </div>
                 <div class="input-group">
-                    <label for="level3-input">INTRODUEIX LA PARAULA CLAU:</label>
-                    <input type="text" id="level3-input" placeholder="RESPOSTA">
-                    <button id="level3-btn">DESXIFRAR</button>
-                    <div id="level3-error" class="error">CLAU INCORRECTA. Torna a provar.</div>
+                    <label for="level1-input">INTRODUEIX LA PARAULA CLAU:</label>
+                    <input type="text" id="level1-input" placeholder="RESPOSTA">
+                    <button id="level1-btn">DESXIFRAR</button>
+                    <div id="level1-error" class="error">CLAU INCORRECTA. Torna a provar.</div>
+                </div>
+            </div>
+
+            <!-- NIVELL 2: LES TRES PORTES MANUAL -->
+            <div id="level-2-container" style="display: none;">
+                <div class="output" style="margin-bottom: 10px;">
+                    NIVELL 2: PROTOCOL DE SEGURETAT<br><br>
+                    Tres portes bloquegen el teu camí. Només una és segura.<br>
+                    S'han interceptat els registres lògics de cada porta:<br><br>
+                    [Porta A]: "La porta C és completament buida."<br>
+                    [Porta B]: "La sortida és exactament darrere d'aquesta porta (B)."<br>
+                    [Porta C]: "La porta B està mentint."<br><br>
+                    AVÍS DEL SISTEMA: Només UNA de les tres afirmacions és CERTA. Les altres dues són FALSES.<br><br>
+                    Introdueix quina porta vols travessar. Atenció: només tens 2 intents abans que el sistema de seguretat es reiniciï.
+                </div>
+                <div class="input-group">
+                    <label for="level2-input">ESCRIU LA TEVA ELECCIÓ (Ex: Porta X):</label>
+                    <input type="text" id="level2-input" placeholder="PORTA _">
+                    <button id="level2-btn">TRAVESSAR</button>
+                    <div id="level2-error" class="error"></div>
+                </div>
+            </div>
+
+            <!-- NIVELL 3: ENDEVINALLA DEL LLIBRE DE POESIA -->
+            <div id="level-3-container" style="display: none;">
+                <div class="output" style="margin-bottom: 10px;">
+                    NIVELL 3: RECERCA EN EL MÓN FÍSIC<br><br>
+                    El sistema requereix un codi d'autenticació analògic. Abandona l'ordinador i troba un objecte a la teva habitació que respongui a això:<br><br>
+                    <i>"No tinc endolls ni pantalles, però guardo molta memòria. Les meves fulles no cauen a la tardor. No em va fer una màquina, sinó la mà d'aquell que et mira amb ulls d'avi. A l'interior hi bateguen rimes i versos dedicats a tu."</i><br><br>
+                    Troba'm, obre'm i busca l'única nota que amago al meu interior.
+                </div>
+                <div class="input-group">
+                    <label for="level3-input">INTRODUEIX LA PARAULA DE LA NOTA:</label>
+                    <input type="text" id="level3-input" placeholder="PARAULA">
+                    <button id="level3-btn">VERIFICAR</button>
+                    <div id="level3-error" class="error">PARAULA INCORRECTA. Segueix buscant.</div>
                 </div>
             </div>
 
@@ -242,44 +200,50 @@
     </div>
 
     <script>
+        // CONFIGURACIÓ GLOBAL
         const correctCode = "2212";
+        let currentAnagramWord = "ENIGMA";
+        let level2Attempts = 0;
         
+        // TEMPORITZADOR (20 minuts = 1200 segons)
+        let timerSeconds = 1200;
+        let timerInterval;
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer-display').innerText = "00:00";
+                    document.getElementById('game-container').innerHTML = "<div class='error' style='display:block; font-size:1.5rem; text-align:center; margin-top: 50px;'>TEMPS ESGOTAT.<br><br>SISTEMA BLOQUEJAT.</div>";
+                    return;
+                }
+                timerSeconds--;
+                let m = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+                let s = (timerSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('timer-display').innerText = `${m}:${s}`;
+            }, 1000);
+        }
+
+        // Iniciar el cronòmetre automàticament en carregar la pàgina
+        window.onload = function() {
+            startTimer();
+            document.getElementById("access-code").focus();
+        };
+
+        // ELEMENTS DEL DOM
         const loginScreen = document.getElementById("login-screen");
         const level1Container = document.getElementById("level-1-container");
         const level2Container = document.getElementById("level-2-container");
         const level3Container = document.getElementById("level-3-container");
         const winContainer = document.getElementById("win-container");
 
+        // LOGIN
         const codeInput = document.getElementById("access-code");
         const loginBtn = document.getElementById("login-btn");
         const errorMsg = document.getElementById("error-msg");
 
-        // Dades del Nivell 1 (Classificació)
-        const groups = [
-            { name: "TIPUS DE CAFÈ", words: ["ESPRESSO", "TALLAT", "CAPPUCCINO", "AMERICÀ"] },
-            { name: "TIPUS DE NÚVOLS", words: ["CÚMUL", "ESTRAT", "CIRRUS", "NIMBUS"] },
-            { name: "CONSTEL·LACIONS", words: ["ORION", "LIRA", "CISNE", "DRAC"] }
-        ];
-
-        let allWords = [];
-        groups.forEach(g => allWords.push(...g.words));
-        allWords.sort(() => Math.random() - 0.5);
-
-        let selectedWords = [];
-        let foundGroupsCount = 0;
-
-        const wordGrid = document.getElementById("word-grid");
-        const level1Btn = document.getElementById("level1-btn");
-        const level1Msg = document.getElementById("level1-msg");
-        const foundGroupsList = document.getElementById("found-groups-list");
-
-        // Nivell 2
-        const level2Msg = document.getElementById("level2-msg");
-
-        // Nivell 3
-        const level3Input = document.getElementById("level3-input");
-        const level3Btn = document.getElementById("level3-btn");
-        const level3Error = document.getElementById("level3-error");
+        loginBtn.addEventListener("click", handleLogin);
+        codeInput.addEventListener("keypress", function(e) { if (e.key === "Enter") handleLogin(); });
 
         function handleLogin() {
             const enteredCode = codeInput.value.trim();
@@ -287,7 +251,7 @@
                 errorMsg.style.display = "none";
                 loginScreen.style.display = "none";
                 level1Container.style.display = "block";
-                renderGrid();
+                document.getElementById("level1-input").focus();
             } else {
                 errorMsg.style.display = "block";
                 codeInput.value = "";
@@ -295,85 +259,86 @@
             }
         }
 
-        function renderGrid() {
-            wordGrid.innerHTML = "";
-            allWords.forEach(word => {
-                const tile = document.createElement("div");
-                tile.className = "word-tile";
-                if (selectedWords.includes(word)) tile.classList.add("selected");
-                tile.innerText = word;
-                tile.onclick = () => toggleWord(word, tile);
-                wordGrid.appendChild(tile);
-            });
-            level1Btn.innerText = `COMPROVAR GRUP (${selectedWords.length}/4)`;
-        }
+        // NIVELL 1 (ANAGRAMA)
+        const level1Input = document.getElementById("level1-input");
+        const level1Btn = document.getElementById("level1-btn");
+        const level1Error = document.getElementById("level1-error");
+        const anagramLettersElement = document.getElementById("anagram-letters");
 
-        function toggleWord(word, tile) {
-            const index = selectedWords.indexOf(word);
-            if (index > -1) {
-                selectedWords.splice(index, 1);
-                tile.classList.remove("selected");
+        level1Btn.addEventListener("click", handleLevel1);
+        level1Input.addEventListener("keypress", function(e) { if (e.key === "Enter") handleLevel1(); });
+
+        function handleLevel1() {
+            const ans = level1Input.value.trim().toUpperCase();
+            if (ans === currentAnagramWord) {
+                level1Error.style.display = "none";
+                level1Container.style.display = "none";
+                level2Container.style.display = "block";
+                document.getElementById("level2-input").focus();
             } else {
-                if (selectedWords.length < 4) {
-                    selectedWords.push(word);
-                    tile.classList.add("selected");
-                }
-            }
-            level1Btn.innerText = `COMPROVAR GRUP (${selectedWords.length}/4)`;
-        }
-
-        function checkLevel1Group() {
-            if (selectedWords.length !== 4) {
-                level1Msg.style.display = "block";
-                level1Msg.innerText = "ERROR: Has de seleccionar exactament 4 paraules.";
-                return;
-            }
-
-            let matchedGroup = null;
-            groups.forEach(g => {
-                const matches = selectedWords.every(w => g.words.includes(w)) && g.words.every(w => selectedWords.includes(w));
-                if (matches) matchedGroup = g;
-            });
-
-            if (matchedGroup) {
-                level1Msg.style.display = "none";
-                allWords = allWords.filter(w => !matchedGroup.words.includes(w));
-                
-                const groupDiv = document.createElement("div");
-                groupDiv.className = "found-group";
-                groupDiv.innerHTML = `<strong>${matchedGroup.name}:</strong> ${matchedGroup.words.join(", ")}`;
-                foundGroupsList.appendChild(groupDiv);
-
-                selectedWords = [];
-                foundGroupsCount++;
-
-                if (foundGroupsCount === 3) {
-                    level1Container.style.display = "none";
-                    level2Container.style.display = "block";
-                } else {
-                    renderGrid();
-                }
-            } else {
-                level1Msg.style.display = "block";
-                level1Msg.innerText = "ERROR: Aquestes 4 paraules no formen un grup vàlid.";
+                level1Error.style.display = "block";
+                level1Input.value = "";
+                level1Input.focus();
             }
         }
 
-        function checkDoor(door) {
-            if (door === 'A') {
-                level2Msg.style.display = "none";
+        // NIVELL 2 (LES PORTES)
+        const level2Input = document.getElementById("level2-input");
+        const level2Btn = document.getElementById("level2-btn");
+        const level2Error = document.getElementById("level2-error");
+
+        level2Btn.addEventListener("click", handleLevel2);
+        level2Input.addEventListener("keypress", function(e) { if (e.key === "Enter") handleLevel2(); });
+
+        function handleLevel2() {
+            // Netejar la resposta de l'usuari (treure espais i posar majúscules)
+            const rawAns = level2Input.value.trim().toUpperCase();
+            const cleanAns = rawAns.replace(/\s+/g, ''); // Converteix "PORTA C" en "PORTAC"
+
+            // Respostes acceptades
+            if (cleanAns === "C" || cleanAns === "PORTAC") {
+                level2Error.style.display = "none";
                 level2Container.style.display = "none";
                 level3Container.style.display = "block";
-                level3Input.focus();
+                document.getElementById("level3-input").focus();
             } else {
-                level2Msg.style.display = "block";
-                level2Msg.innerHTML = "ERROR: Porta incorrecta. El sistema no respon. Torna-ho a provar.";
+                level2Attempts++;
+                if (level2Attempts === 1) {
+                    level2Error.innerText = "ERROR: Porta incorrecta. Avís de seguretat: et queda 1 INTENT abans que el sistema es reiniciï.";
+                    level2Error.style.display = "block";
+                    level2Input.value = "";
+                    level2Input.focus();
+                } else {
+                    // Reinici del joc (però no del cronòmetre)
+                    level2Attempts = 0;
+                    currentAnagramWord = "LABERINT";
+                    anagramLettersElement.innerText = "T - R - N - I - L - B - A - E";
+                    
+                    level2Error.style.display = "none";
+                    level2Input.value = "";
+                    level1Input.value = "";
+                    
+                    level2Container.style.display = "none";
+                    level1Container.style.display = "block";
+                    
+                    level1Error.innerText = "ERROR DE SEGURETAT MÀXIMA. S'ha reiniciat l'encriptació. Torna a començar.";
+                    level1Error.style.display = "block";
+                    level1Input.focus();
+                }
             }
         }
+
+        // NIVELL 3 (ENDEVINALLA FLOR)
+        const level3Input = document.getElementById("level3-input");
+        const level3Btn = document.getElementById("level3-btn");
+        const level3Error = document.getElementById("level3-error");
+
+        level3Btn.addEventListener("click", handleLevel3);
+        level3Input.addEventListener("keypress", function(e) { if (e.key === "Enter") handleLevel3(); });
 
         function handleLevel3() {
             const ans = level3Input.value.trim().toUpperCase();
-            if (ans === "ENIGMA") {
+            if (ans === "FLOR") {
                 level3Error.style.display = "none";
                 level3Container.style.display = "none";
                 winContainer.style.display = "block";
@@ -383,18 +348,6 @@
                 level3Input.focus();
             }
         }
-
-        loginBtn.addEventListener("click", handleLogin);
-        codeInput.addEventListener("keypress", function(e) { if (e.key === "Enter") handleLogin(); });
-
-        level1Btn.addEventListener("click", checkLevel1Group);
-
-        level3Btn.addEventListener("click", handleLevel3);
-        level3Input.addEventListener("keypress", function(e) { if (e.key === "Enter") handleLevel3(); });
-
-        window.onload = function() {
-            codeInput.focus();
-        };
     </script>
 </body>
 </html>
